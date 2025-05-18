@@ -13,4 +13,4 @@ help:
 
 .PHONY:
 run: 
-	go build -C cmd -o dengueboy && ./cmd/dengueboy
+	go run cmd/main.go
