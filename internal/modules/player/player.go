@@ -1,6 +1,10 @@
 package player
 
-import "app/internal/modules/geom"
+import (
+	"app/internal/modules/geom"
+
+	"github.com/hajimehoshi/ebiten"
+)
 
 const (
 	MoveLeft  CurrentAction = "move_left"
@@ -23,7 +27,7 @@ type (
 	}
 )
 
-func (p *Player) Update(key string) {
+func (p *Player) Update(key int) {
 	p.setCurrentAction(key)
 
 	switch p.CurrentAction {
@@ -40,6 +44,15 @@ func (p *Player) Update(key string) {
 	}
 }
 
-func (p *Player) setCurrentAction(key string) {
-	p.CurrentAction = MoveDown
+func (p *Player) setCurrentAction(key int) {
+	switch key {
+	case int(ebiten.KeyUp):
+		p.CurrentAction = MoveUp
+	case int(ebiten.KeyDown):
+		p.CurrentAction = MoveDown
+	case int(ebiten.KeyLeft):
+		p.CurrentAction = MoveDown
+	case int(ebiten.KeyRight):
+		p.CurrentAction = MoveRight
+	}
 }
