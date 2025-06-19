@@ -1,4 +1,4 @@
-package game
+package maptile
 
 import "app/internal/modules/geom"
 
@@ -19,12 +19,26 @@ type (
 	}
 )
 
-func (m *Map) Update(playerPosition geom.Position) {
-	m.Tiles[playerPosition.Y][playerPosition.X] = playerPosition.Y
+func New() *Map {
+	return &Map{
+		Tiles: getInitialMap(),
+	}
 }
 
-func (m *Map) SetInitialMap() {
-	m.Tiles = [][]int{
+func (m *Map) Update(playerPosition geom.Position, playerPreviousPosition geom.Position) {
+	m.Tiles[playerPreviousPosition.Y][playerPreviousPosition.X] = int(Empty)
+	m.Tiles[playerPosition.Y][playerPosition.X] = int(Player)
+}
+
+func (m *Map) GetTileAt(position geom.Position) MapTile {
+	if position.Y < 0 || position.Y >= len(m.Tiles) || position.X < 0 || position.X >= len(m.Tiles[0]) {
+		return Wall
+	}
+	return MapTile(m.Tiles[position.Y][position.X])
+}
+
+func getInitialMap() [][]int {
+	return [][]int{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
