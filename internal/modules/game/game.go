@@ -3,7 +3,6 @@ package game
 import (
 	"app/internal/modules/maptile"
 	"app/internal/modules/player"
-	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
@@ -33,14 +32,11 @@ func New(maptile *maptile.Map, player *player.Player, inputSystem input.System) 
 func (g *Game) Update() error {
 	g.updateInput()
 	g.updatePlayer()
-	g.updateMap()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	if err := g.renderMap(screen); err != nil {
-		log.Println("error rendering map:", err)
-	}
+	g.Map.Draw(screen)
 	g.Player.Draw(screen)
 }
 
@@ -54,8 +50,4 @@ func (g *Game) updateInput() {
 
 func (g *Game) updatePlayer() {
 	g.Player.Update(g.Map)
-}
-
-func (g *Game) updateMap() {
-	g.Map.Update(g.Player.Position, g.Player.PreviousPosition)
 }

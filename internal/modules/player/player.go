@@ -3,11 +3,8 @@ package player
 import (
 	"app/internal/modules/geom"
 	"app/internal/modules/maptile"
-	"image"
-	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	input "github.com/quasilyte/ebitengine-input"
 )
 
@@ -35,8 +32,11 @@ type (
 	}
 )
 
-func New(inputHandler *input.Handler) *Player {
-	sprites := loadPlayerSprites()
+func New(inputHandler *input.Handler) (*Player, error) {
+	sprites, err := loadSprites()
+	if err != nil {
+		return nil, err
+	}
 	return &Player{
 		Position:         geom.Position{X: 1, Y: 1},
 		PreviousPosition: geom.Position{X: 1, Y: 1},
@@ -44,23 +44,17 @@ func New(inputHandler *input.Handler) *Player {
 		InputHandler:     inputHandler,
 		Sprites:          sprites,
 		CurrentSprite:    sprites[NoAction],
-	}
+	}, nil
 }
 
 func (p *Player) Update(mapTile *maptile.Map) {
 	p.setCurrentAction()
+	p.setSprite()
 	wantedPosition := p.getWantedPosition()
 	if mapTile.GetTileAt(wantedPosition) == maptile.Empty {
 		p.PreviousPosition = p.Position
 		p.Position = wantedPosition
 	}
-	p.updateSprite()
-}
-
-func (p *Player) Draw(screen *ebiten.Image) {
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(p.Position.X*32), float64(p.Position.Y*32))
-	screen.DrawImage(p.CurrentSprite, op)
 }
 
 func (p *Player) getWantedPosition() geom.Position {
@@ -102,26 +96,11 @@ func (p *Player) setCurrentAction() {
 	p.CurrentAction = NoAction
 }
 
-func (p *Player) updateSprite() {
+func (p *Player) setSprite() {
 	if sprite, exists := p.Sprites[p.CurrentAction]; exists {
 		p.CurrentSprite = sprite
-	} else {
-		p.CurrentSprite = p.Sprites[NoAction]
+		return
 	}
-}
+	p.CurrentSprite = p.Sprites[NoAction]
 
-func loadPlayerSprites() map[input.Action]*ebiten.Image {
-	charImage, _, err := ebitenutil.NewImageFromFile("assets/images/char.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	spriteSize := 32
-	return map[input.Action]*ebiten.Image{
-		NoAction:  charImage.SubImage(image.Rect(0, 0, spriteSize, spriteSize)).(*ebiten.Image),
-		MoveLeft:  charImage.SubImage(image.Rect(spriteSize, 0, spriteSize*2, spriteSize)).(*ebiten.Image),
-		MoveRight: charImage.SubImage(image.Rect(spriteSize*2, 0, spriteSize*3, spriteSize)).(*ebiten.Image),
-		MoveUp:    charImage.SubImage(image.Rect(spriteSize*3, 0, spriteSize*4, spriteSize)).(*ebiten.Image),
-		MoveDown:  charImage.SubImage(image.Rect(spriteSize*4, 0, spriteSize*5, spriteSize)).(*ebiten.Image),
-	}
 }

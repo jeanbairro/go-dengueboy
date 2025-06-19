@@ -1,33 +1,37 @@
 package maptile
 
-import "app/internal/modules/geom"
+import (
+	"app/internal/modules/geom"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 const (
 	Empty     MapTile = 0
 	Wall      MapTile = 1
-	Player    MapTile = 2
-	WaterTire MapTile = 3
-	WaterVase MapTile = 4
-	EmptyTire MapTile = 5
+	WaterTire MapTile = 2
+	WaterVase MapTile = 3
+	EmptyTire MapTile = 4
 )
 
 type (
 	MapTile int
 
 	Map struct {
-		Tiles [][]int
+		Tiles  [][]int
+		Images map[MapTile]*ebiten.Image
 	}
 )
 
-func New() *Map {
-	return &Map{
-		Tiles: getInitialMap(),
+func New() (*Map, error) {
+	images, err := loadImageTiles()
+	if err != nil {
+		return nil, err
 	}
-}
-
-func (m *Map) Update(playerPosition geom.Position, playerPreviousPosition geom.Position) {
-	m.Tiles[playerPreviousPosition.Y][playerPreviousPosition.X] = int(Empty)
-	m.Tiles[playerPosition.Y][playerPosition.X] = int(Player)
+	return &Map{
+		Tiles:  loadMap(),
+		Images: images,
+	}, nil
 }
 
 func (m *Map) GetTileAt(position geom.Position) MapTile {
@@ -37,10 +41,10 @@ func (m *Map) GetTileAt(position geom.Position) MapTile {
 	return MapTile(m.Tiles[position.Y][position.X])
 }
 
-func getInitialMap() [][]int {
+func loadMap() [][]int {
 	return [][]int{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
