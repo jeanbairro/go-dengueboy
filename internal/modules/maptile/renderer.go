@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	imageSize = 32
+	ImageSize = 32
 )
 
 func (m *Map) Draw(screen *ebiten.Image) error {
@@ -16,7 +16,7 @@ func (m *Map) Draw(screen *ebiten.Image) error {
 		for x := range m.Tiles[y] {
 			tile := MapTile(m.Tiles[y][x])
 			op := &ebiten.DrawImageOptions{GeoM: ebiten.GeoM{}}
-			op.GeoM.Translate(float64(imageSize*x), float64(imageSize*y))
+			op.GeoM.Translate(float64(ImageSize*x), float64(ImageSize*y))
 			screen.DrawImage(m.Images[tile], op)
 		}
 	}
@@ -28,8 +28,8 @@ func loadImageTiles() (map[MapTile]*ebiten.Image, error) {
 	if error != nil {
 		return nil, error
 	}
-	emptyImage := jungle.SubImage(image.Rect(0, 0, imageSize, imageSize)).(*ebiten.Image)
-	wallImage := jungle.SubImage(image.Rect(imageSize, 0, jungle.Bounds().Max.X, imageSize)).(*ebiten.Image)
+	emptyImage := jungle.SubImage(image.Rect(0, 0, ImageSize, ImageSize)).(*ebiten.Image)
+	wallImage := jungle.SubImage(image.Rect(ImageSize, 0, jungle.Bounds().Max.X, ImageSize)).(*ebiten.Image)
 	return map[MapTile]*ebiten.Image{
 		Empty: emptyImage,
 		Wall:  wallImage,

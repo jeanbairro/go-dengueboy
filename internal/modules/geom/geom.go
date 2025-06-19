@@ -1,18 +1,20 @@
 package geom
 
-import "math"
+import (
+	"math"
+)
 
 type Position struct {
-	X, Y int
+	X, Y float64
 }
 
-func (p *Position) Move(dx, dy int) {
+func (p *Position) Move(dx, dy float64) {
 	p.X += dx
 	p.Y += dy
 }
 
-func (p *Position) DistanceTo(otherPosition Position) int {
-	distanceX := math.Abs(float64(p.X) - float64(otherPosition.X))
-	distanceY := math.Abs(float64(p.Y) - float64(otherPosition.Y))
-	return int(distanceX + distanceY)
+func (p *Position) DistanceTo(otherPosition Position) float64 {
+	distanceX := math.Abs(p.X - otherPosition.X)
+	distanceY := math.Abs(p.Y - otherPosition.Y)
+	return distanceX + distanceY
 }

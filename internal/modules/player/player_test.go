@@ -1,6 +1,7 @@
 package player_test
 
 import (
+	"app/internal/modules/collision"
 	"app/internal/modules/geom"
 	"app/internal/modules/maptile"
 	"app/internal/modules/player"
@@ -15,7 +16,7 @@ func TestPlayerMovement(t *testing.T) {
 	require.NoError(t, error)
 	require.NotNil(t, mapTile)
 
-	testPlayer, error := player.New(&input.Handler{})
+	testPlayer, error := player.New(&input.Handler{}, &collision.CollisionSystem{})
 	require.NoError(t, error)
 	require.NotNil(t, testPlayer)
 

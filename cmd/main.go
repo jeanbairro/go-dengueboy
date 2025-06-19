@@ -1,6 +1,7 @@
 package main
 
 import (
+	"app/internal/modules/collision"
 	"app/internal/modules/game"
 	"app/internal/modules/maptile"
 	"app/internal/modules/player"
@@ -37,13 +38,17 @@ func initializeGame() (*game.Game, error) {
 		player.MoveDown:  {input.KeyGamepadDown, input.KeyDown, input.KeyS},
 		player.Interact:  {input.KeyGamepadA, input.KeyEnter, input.KeySpace},
 	}
-	player, err := player.New(inputSystem.NewHandler(0, keymap))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create player: %w", err)
-	}
 	mapTile, err := maptile.New()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create map tile: %w", err)
+	}
+	collisionSystem, err := collision.New(mapTile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create collision system: %w", err)
+	}
+	player, err := player.New(inputSystem.NewHandler(0, keymap), collisionSystem)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create player: %w", err)
 	}
 	return game.New(mapTile, player, inputSystem), nil
 }

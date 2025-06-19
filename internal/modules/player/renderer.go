@@ -9,9 +9,13 @@ import (
 	input "github.com/quasilyte/ebitengine-input"
 )
 
+const (
+	spriteSize = 32
+)
+
 func (p *Player) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(p.Position.X*32), float64(p.Position.Y*32))
+	op.GeoM.Translate(float64(p.Position.X*spriteSize), float64(p.Position.Y*spriteSize))
 	screen.DrawImage(p.CurrentSprite, op)
 }
 
@@ -21,7 +25,6 @@ func loadSprites() (map[input.Action]*ebiten.Image, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	spriteSize := 32
 	return map[input.Action]*ebiten.Image{
 		NoAction:  charImage.SubImage(image.Rect(0, 0, spriteSize, spriteSize)).(*ebiten.Image),
 		MoveLeft:  charImage.SubImage(image.Rect(spriteSize, 0, spriteSize*2, spriteSize)).(*ebiten.Image),

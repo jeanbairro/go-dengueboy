@@ -35,12 +35,13 @@ func New() (*Map, error) {
 }
 
 func (m *Map) GetTileAt(position geom.Position) MapTile {
-	if position.Y < 0 || position.Y >= len(m.Tiles) || position.X < 0 || position.X >= len(m.Tiles[0]) {
+	if position.X < 0 || position.Y < 0 || position.X >= float64(len(m.Tiles[0])) || position.Y >= float64(len(m.Tiles)) {
 		return Wall
 	}
-	return MapTile(m.Tiles[position.Y][position.X])
+	return MapTile(m.Tiles[int(position.Y)][int(position.X)])
 }
 
+// 25 x 20
 func loadMap() [][]int {
 	return [][]int{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
