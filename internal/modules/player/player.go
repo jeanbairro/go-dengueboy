@@ -19,18 +19,21 @@ const (
 )
 
 const (
-	speed float64 = .08
+	initialPositionX float64 = 2
+	initialPositionY float64 = 2
+	speed            float64 = .08
 )
 
 type (
 	Player struct {
-		Position         geom.Position
-		PreviousPosition geom.Position
-		CurrentAction    input.Action
-		InputHandler     *input.Handler
-		Sprites          map[input.Action]*ebiten.Image
-		CurrentSprite    *ebiten.Image
-		CollisionSystem  *collision.CollisionSystem
+		Position           geom.Position
+		PreviousPosition   geom.Position
+		CurrentAction      input.Action
+		InputHandler       *input.Handler
+		Sprites            map[input.Action][]*ebiten.Image
+		CurrentSprite      *ebiten.Image
+		CurrentSpriteIndex int
+		CollisionSystem    *collision.CollisionSystem
 	}
 )
 
@@ -40,13 +43,14 @@ func New(inputHandler *input.Handler, collisionSystem *collision.CollisionSystem
 		return nil, err
 	}
 	return &Player{
-		Position:         geom.Position{X: 2, Y: 2},
-		PreviousPosition: geom.Position{X: 2, Y: 2},
-		CurrentAction:    NoAction,
-		InputHandler:     inputHandler,
-		Sprites:          sprites,
-		CurrentSprite:    sprites[NoAction],
-		CollisionSystem:  collisionSystem,
+		Position:           geom.Position{X: initialPositionX, Y: initialPositionY},
+		PreviousPosition:   geom.Position{X: initialPositionX, Y: initialPositionY},
+		CurrentAction:      NoAction,
+		InputHandler:       inputHandler,
+		Sprites:            sprites,
+		CurrentSprite:      sprites[NoAction][0],
+		CurrentSpriteIndex: 0,
+		CollisionSystem:    collisionSystem,
 	}, nil
 }
 
@@ -111,10 +115,11 @@ func (p *Player) setCurrentAction() {
 }
 
 func (p *Player) setSprite() {
-	if sprite, exists := p.Sprites[p.CurrentAction]; exists {
-		p.CurrentSprite = sprite
-		return
+	if sprites, exists := p.Sprites[p.CurrentAction]; exists {
+		if p.CurrentSpriteIndex >= len(sprites) {
+			p.CurrentSpriteIndex = 0
+		}
+		p.CurrentSprite = sprites[p.CurrentSpriteIndex]
+		p.CurrentSpriteIndex++
 	}
-	p.CurrentSprite = p.Sprites[NoAction]
-
 }

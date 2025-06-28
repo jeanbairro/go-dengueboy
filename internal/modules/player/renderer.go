@@ -10,7 +10,12 @@ import (
 )
 
 const (
-	spriteSize = 32
+	spriteSize        = 32
+	spriteCount       = 5
+	moveDownImageRow  = 0
+	moveLeftImageRow  = 1
+	moveUpImageRow    = 2
+	moveRightImageRow = 3
 )
 
 func (p *Player) Draw(screen *ebiten.Image) {
@@ -19,17 +24,25 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	screen.DrawImage(p.CurrentSprite, op)
 }
 
-func loadSprites() (map[input.Action]*ebiten.Image, error) {
+func loadSprites() (map[input.Action][]*ebiten.Image, error) {
 	charImage, _, err := ebitenutil.NewImageFromFile("assets/images/char.png")
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
-	return map[input.Action]*ebiten.Image{
-		NoAction:  charImage.SubImage(image.Rect(0, 0, spriteSize, spriteSize)).(*ebiten.Image),
-		MoveLeft:  charImage.SubImage(image.Rect(spriteSize, 0, spriteSize*2, spriteSize)).(*ebiten.Image),
-		MoveRight: charImage.SubImage(image.Rect(spriteSize*2, 0, spriteSize*3, spriteSize)).(*ebiten.Image),
-		MoveUp:    charImage.SubImage(image.Rect(spriteSize*3, 0, spriteSize*4, spriteSize)).(*ebiten.Image),
-		MoveDown:  charImage.SubImage(image.Rect(spriteSize*4, 0, spriteSize*5, spriteSize)).(*ebiten.Image),
+	return map[input.Action][]*ebiten.Image{
+		NoAction:  {charImage.SubImage(image.Rect(0, 0, spriteSize, spriteSize)).(*ebiten.Image)},
+		MoveDown:  loadActionSprites(charImage, moveDownImageRow),
+		MoveLeft:  loadActionSprites(charImage, moveLeftImageRow),
+		MoveUp:    loadActionSprites(charImage, moveUpImageRow),
+		MoveRight: loadActionSprites(charImage, moveRightImageRow),
 	}, nil
+}
+
+func loadActionSprites(charImage *ebiten.Image, imageRow int) []*ebiten.Image {
+	sprites := make([]*ebiten.Image, spriteCount)
+	for i := range spriteCount {
+		sprites[i] = charImage.SubImage(image.Rect(spriteSize*i, spriteSize*imageRow, spriteSize*(i+1), spriteSize*(imageRow+1))).(*ebiten.Image)
+	}
+	return sprites
 }
