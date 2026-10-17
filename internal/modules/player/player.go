@@ -62,12 +62,6 @@ func (p *Player) Update() {
 	p.setSprite()
 }
 
-// Move applies movement to p.Position one axis at a time (X then Y),
-// checking p.CollisionSystem.HasCollision independently per axis so the
-// player slides along a wall instead of stopping dead when only one axis
-// is blocked. It always updates p.PreviousPosition to the position before
-// the move and p.CurrentAction to reflect the direction implied by
-// movement, regardless of whether the move was blocked.
 func (p *Player) Move(movement geom.Position) {
 	p.updateFacing(movement)
 	p.PreviousPosition = p.Position
@@ -91,9 +85,6 @@ func toObject(position geom.Position) collision.Object {
 	}
 }
 
-// movementIntent turns the 4 pressed-direction booleans into raw per-axis
-// intent in {-1, 0, 1}, summing opposing directions to 0 when both are
-// pressed.
 func movementIntent(left, right, up, down bool) (dx, dy float64) {
 	if left {
 		dx--
@@ -120,9 +111,6 @@ func (p *Player) readMovementVector() geom.Position {
 	return geom.NormalizeDiagonal(dx, dy, speed)
 }
 
-// updateFacing sets p.CurrentAction from the sign of movement. MoveLeft and
-// MoveRight take priority over MoveUp and MoveDown when both axes are
-// non-zero, since the spritesheet only has 4 cardinal rows.
 func (p *Player) updateFacing(movement geom.Position) {
 	switch {
 	case movement.X < 0:

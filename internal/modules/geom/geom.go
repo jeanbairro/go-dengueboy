@@ -19,9 +19,6 @@ func (p *Position) DistanceTo(otherPosition Position) float64 {
 	return distanceX + distanceY
 }
 
-// NormalizeDiagonal returns the movement vector for per-axis intent dx and dy
-// (each -1, 0 or 1) scaled to speed. When both axes are active, the vector is
-// scaled by 1/sqrt(2) so diagonal movement is no faster than cardinal movement.
 func NormalizeDiagonal(dx, dy, speed float64) Position {
 	if dx != 0 && dy != 0 {
 		const invSqrt2 = 0.7071067811865476
