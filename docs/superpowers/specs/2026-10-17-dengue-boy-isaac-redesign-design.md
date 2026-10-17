@@ -190,9 +190,47 @@ sugeridas — não confirmadas linha a linha pelo autor)
   `objects.png` (pneus e vasos, sem estados visuais
   infestado/limpo).
 
-## Próximo passo
+## Roadmap de implementação
 
-Com este documento aprovado, o próximo passo é transformar isso num
-plano de implementação (skill `superpowers:writing-plans`) e, a partir
-dele, abrir a branch nova para começar o desenvolvimento (sprites,
-sistema de salas, movimento livre, etc).
+Esse spec cobre o redesign inteiro, mas o trabalho é grande demais pra um
+plano só — é construído em fatias, cada uma com seu próprio plano de
+implementação (skill `superpowers:writing-plans`) e seu próprio PR contra
+a branch de integração `feature/dengue-redesign`. Ordem definida pela
+dependência técnica entre as peças, não só pela ordem narrativa do jogo:
+
+1. ✅ **Fundação** — movimento livre 360°, sistema de entidade genérico
+   (`entity.Entity`/`Manager`). Plano:
+   [2026-10-17-free-movement-entity-foundation.md](../plans/2026-10-17-free-movement-entity-foundation.md).
+   PR #1.
+2. ⬜ **Salas & construção** — `Room`/`Building`, geração procedural a
+   partir de salas-modelo, portas, minimapa, e **câmera por sala**
+   (adiada da Fundação de propósito — só faz sentido quando existem salas
+   menores que a tela).
+3. ⬜ **Combate** — ataque à distância com mira independente do
+   movimento, projéteis, vida/dano do jogador, framework de status
+   effect (reaproveitável pelos bosses).
+4. ⬜ **Limpeza (foco de dengue)** — pneu/vaso/poça/garrafa/calha como
+   entidades interativas, ação `Interact` ligada pela primeira vez,
+   condição de "sala limpa" que destrava as portas da Salas (depende de
+   #2).
+5. ⬜ **Inimigos & bosses** — IA base de inimigo + a escada de bosses por
+   season (larva gigante → mosquito macho → fêmea → enxame → chefão
+   final), lógica de "morte reinicia só a season atual" (depende de #3).
+6. ⬜ **Poderes** — itens que modificam o ataque/stats do jogador,
+   coletados durante a season (depende de #3).
+7. ⬜ **Sprites** — primeira leva de placeholders em pixel art pra todo o
+   elenco (personagem, inimigos, objetos, tileset), pro autor refinar
+   depois. Pode rodar em paralelo com qualquer item acima assim que o
+   elenco de cada fatia estiver definido.
+
+**Dois itens com decisão de design ainda em aberto**, marcados como "fica
+a cargo de quem constrói" nas seções acima — merecem uma rodada curta de
+brainstorm antes de virarem plano, em vez de decisão unilateral de quem
+implementar:
+- **#6 Poderes**: lista exata de habilidades ainda não foi definida.
+- **#5 Inimigos & bosses**: o padrão geral de combate já está definido
+  (projétil legível + corpo segmentado), mas o ataque específico de cada
+  boss individual ainda não.
+
+Os itens #2 (Salas) e #3 (Combate) já têm spec suficiente pra ir direto
+pra um plano de implementação, sem brainstorm extra.
