@@ -18,8 +18,13 @@ type (
 )
 
 func New(mapTile *maptile.Map) (*CollisionSystem, error) {
-	objects := createCollisionObjects(mapTile)
-	return &CollisionSystem{Objects: objects}, nil
+	c := &CollisionSystem{}
+	c.Rebuild(mapTile)
+	return c, nil
+}
+
+func (c *CollisionSystem) Rebuild(mapTile *maptile.Map) {
+	c.Objects = createCollisionObjects(mapTile)
 }
 
 func (c *CollisionSystem) HasCollision(obj Object) bool {
