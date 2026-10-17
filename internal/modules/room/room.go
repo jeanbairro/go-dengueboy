@@ -1,6 +1,10 @@
 package room
 
-import "app/internal/modules/maptile"
+import (
+	"app/internal/modules/collision"
+	"app/internal/modules/geom"
+	"app/internal/modules/maptile"
+)
 
 const (
 	North Side = iota
@@ -77,4 +81,41 @@ func NewBlankRoomTiles(doors map[Side]bool) [][]int {
 	}
 
 	return tiles
+}
+
+func doorTile(side Side) (column, row int) {
+	switch side {
+	case North:
+		return DoorColumnNS, DoorRowNorth
+	case South:
+		return DoorColumnNS, DoorRowSouth
+	case East:
+		return DoorColumnEast, DoorRowEW
+	default:
+		return DoorColumnWest, DoorRowEW
+	}
+}
+
+func DoorZone(side Side) collision.Object {
+	column, row := doorTile(side)
+	return collision.Object{
+		Position: geom.Position{X: float64(column * maptile.ImageSize), Y: float64(row * maptile.ImageSize)},
+		Width:    maptile.ImageSize,
+		Height:   maptile.ImageSize,
+	}
+}
+
+func EntryPosition(side Side) geom.Position {
+	column, row := doorTile(side)
+	switch side {
+	case North:
+		row++
+	case South:
+		row--
+	case East:
+		column--
+	default:
+		column++
+	}
+	return geom.Position{X: float64(column * maptile.ImageSize), Y: float64(row * maptile.ImageSize)}
 }

@@ -1,6 +1,8 @@
 package room_test
 
 import (
+	"app/internal/modules/collision"
+	"app/internal/modules/geom"
 	"app/internal/modules/maptile"
 	"app/internal/modules/room"
 	"testing"
@@ -33,4 +35,18 @@ func TestNewBlankRoomTilesOpensDoorOnRequestedSide(t *testing.T) {
 	tiles := room.NewBlankRoomTiles(map[room.Side]bool{room.North: true})
 	require.Equal(t, int(maptile.Door), tiles[0][12], "north door must open at the fixed column")
 	require.Equal(t, int(maptile.Wall), tiles[19][12], "south side must stay closed when not requested")
+}
+
+func TestDoorZonePositions(t *testing.T) {
+	require.Equal(t, collision.Object{Position: geom.Position{X: 384, Y: 0}, Width: 32, Height: 32}, room.DoorZone(room.North))
+	require.Equal(t, collision.Object{Position: geom.Position{X: 384, Y: 608}, Width: 32, Height: 32}, room.DoorZone(room.South))
+	require.Equal(t, collision.Object{Position: geom.Position{X: 768, Y: 288}, Width: 32, Height: 32}, room.DoorZone(room.East))
+	require.Equal(t, collision.Object{Position: geom.Position{X: 0, Y: 288}, Width: 32, Height: 32}, room.DoorZone(room.West))
+}
+
+func TestEntryPositions(t *testing.T) {
+	require.Equal(t, geom.Position{X: 384, Y: 32}, room.EntryPosition(room.North))
+	require.Equal(t, geom.Position{X: 384, Y: 576}, room.EntryPosition(room.South))
+	require.Equal(t, geom.Position{X: 736, Y: 288}, room.EntryPosition(room.East))
+	require.Equal(t, geom.Position{X: 32, Y: 288}, room.EntryPosition(room.West))
 }
