@@ -2,8 +2,8 @@ package player
 
 import (
 	"app/internal/modules/collision"
+	"app/internal/modules/entity"
 	"app/internal/modules/geom"
-	"app/internal/modules/maptile"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
@@ -19,10 +19,12 @@ const (
 )
 
 const (
-	initialPositionX float64 = 2
-	initialPositionY float64 = 2
-	speed            float64 = .08
+	initialPositionX float64 = 64
+	initialPositionY float64 = 64
+	speed            float64 = 2.56
 )
+
+var _ entity.Entity = (*Player)(nil)
 
 type (
 	Player struct {
@@ -54,64 +56,86 @@ func New(inputHandler *input.Handler, collisionSystem *collision.CollisionSystem
 	}, nil
 }
 
-func (p *Player) Update(mapTile *maptile.Map) {
-	p.setCurrentAction()
+func (p *Player) Update() {
+	movement := p.readMovementVector()
+	p.Move(movement)
 	p.setSprite()
-	wantedPosition := p.getWantedPosition()
-	if !p.CollisionSystem.HasCollision(toObject(wantedPosition)) {
-		p.PreviousPosition = p.Position
-		p.Position = wantedPosition
+}
+
+// Move applies movement to p.Position one axis at a time (X then Y),
+// checking p.CollisionSystem.HasCollision independently per axis so the
+// player slides along a wall instead of stopping dead when only one axis
+// is blocked. It always updates p.PreviousPosition to the position before
+// the move and p.CurrentAction to reflect the direction implied by
+// movement, regardless of whether the move was blocked.
+func (p *Player) Move(movement geom.Position) {
+	p.updateFacing(movement)
+	p.PreviousPosition = p.Position
+
+	wantedX := p.Position.X + movement.X
+	if !p.CollisionSystem.HasCollision(toObject(geom.Position{X: wantedX, Y: p.Position.Y})) {
+		p.Position.X = wantedX
+	}
+
+	wantedY := p.Position.Y + movement.Y
+	if !p.CollisionSystem.HasCollision(toObject(geom.Position{X: p.Position.X, Y: wantedY})) {
+		p.Position.Y = wantedY
 	}
 }
 
 func toObject(position geom.Position) collision.Object {
 	return collision.Object{
-		Position: geom.Position{
-			X: float64(position.X) * float64(spriteSize),
-			Y: float64(position.Y) * float64(spriteSize),
-		},
-		Width:  float64(spriteSize),
-		Height: float64(spriteSize),
+		Position: position,
+		Width:    float64(spriteSize),
+		Height:   float64(spriteSize),
 	}
 }
 
-func (p *Player) getWantedPosition() geom.Position {
-	wantedPosition := p.Position
-	switch p.CurrentAction {
-	case MoveLeft:
-		wantedPosition.Move(speed*-1, 0)
-	case MoveRight:
-		wantedPosition.Move(speed, 0)
-	case MoveUp:
-		wantedPosition.Move(0, speed*-1)
-	case MoveDown:
-		wantedPosition.Move(0, speed)
+// movementIntent turns the 4 pressed-direction booleans into raw per-axis
+// intent in {-1, 0, 1}, summing opposing directions to 0 when both are
+// pressed.
+func movementIntent(left, right, up, down bool) (dx, dy float64) {
+	if left {
+		dx--
 	}
-	return wantedPosition
+	if right {
+		dx++
+	}
+	if up {
+		dy--
+	}
+	if down {
+		dy++
+	}
+	return dx, dy
 }
 
-func (p *Player) setCurrentAction() {
-	if p.InputHandler.ActionIsPressed(MoveLeft) {
+func (p *Player) readMovementVector() geom.Position {
+	dx, dy := movementIntent(
+		p.InputHandler.ActionIsPressed(MoveLeft),
+		p.InputHandler.ActionIsPressed(MoveRight),
+		p.InputHandler.ActionIsPressed(MoveUp),
+		p.InputHandler.ActionIsPressed(MoveDown),
+	)
+	return geom.NormalizeDiagonal(dx, dy, speed)
+}
+
+// updateFacing sets p.CurrentAction from the sign of movement. MoveLeft and
+// MoveRight take priority over MoveUp and MoveDown when both axes are
+// non-zero, since the spritesheet only has 4 cardinal rows.
+func (p *Player) updateFacing(movement geom.Position) {
+	switch {
+	case movement.X < 0:
 		p.CurrentAction = MoveLeft
-		return
-	}
-	if p.InputHandler.ActionIsPressed(MoveRight) {
+	case movement.X > 0:
 		p.CurrentAction = MoveRight
-		return
-	}
-	if p.InputHandler.ActionIsPressed(MoveUp) {
+	case movement.Y < 0:
 		p.CurrentAction = MoveUp
-		return
-	}
-	if p.InputHandler.ActionIsPressed(MoveDown) {
+	case movement.Y > 0:
 		p.CurrentAction = MoveDown
-		return
+	default:
+		p.CurrentAction = NoAction
 	}
-	if p.InputHandler.ActionIsPressed(Interact) {
-		p.CurrentAction = Interact
-		return
-	}
-	p.CurrentAction = NoAction
 }
 
 func (p *Player) setSprite() {
