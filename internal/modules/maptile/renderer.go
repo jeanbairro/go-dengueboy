@@ -33,5 +33,6 @@ func loadImageTiles() (map[MapTile]*ebiten.Image, error) {
 	return map[MapTile]*ebiten.Image{
 		Empty: emptyImage,
 		Wall:  wallImage,
+		Door:  emptyImage,
 	}, nil
 }

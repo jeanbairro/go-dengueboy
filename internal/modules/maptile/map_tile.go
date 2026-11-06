@@ -12,6 +12,7 @@ const (
 	WaterTire MapTile = 2
 	WaterVase MapTile = 3
 	EmptyTire MapTile = 4
+	Door      MapTile = 5
 )
 
 type (
