@@ -83,3 +83,19 @@ func TestTryMoveFailsWhenCurrentRoomIsNotCleared(t *testing.T) {
 	ok := b.TryMove(room.East)
 	require.False(t, ok)
 }
+
+func TestNewMarksStartRoomAsVisited(t *testing.T) {
+	spawn := &room.Room{Cleared: true}
+	b := building.New(map[building.Coord]*room.Room{{0, 0}: spawn}, building.Coord{0, 0})
+	require.True(t, b.Visited[building.Coord{0, 0}])
+	require.Len(t, b.Visited, 1)
+}
+
+func TestTryMoveMarksDestinationAsVisited(t *testing.T) {
+	b := twoConnectedRooms() // já existe em building_test.go
+	b.Visited = map[building.Coord]bool{{0, 0}: true}
+
+	b.TryMove(room.East)
+
+	require.True(t, b.Visited[building.Coord{1, 0}])
+}

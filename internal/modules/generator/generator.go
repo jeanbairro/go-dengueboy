@@ -59,5 +59,5 @@ func Generate(roomCount int, rng *rand.Rand, images map[maptile.MapTile]*ebiten.
 		}
 	}
 
-	return &building.Building{Rooms: rooms, Current: building.Coord{X: 0, Y: 0}}
+	return building.New(rooms, building.Coord{X: 0, Y: 0})
 }

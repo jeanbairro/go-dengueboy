@@ -10,8 +10,13 @@ type (
 	Building struct {
 		Rooms   map[Coord]*room.Room
 		Current Coord
+		Visited map[Coord]bool
 	}
 )
+
+func New(rooms map[Coord]*room.Room, start Coord) *Building {
+	return &Building{Rooms: rooms, Current: start, Visited: map[Coord]bool{start: true}}
+}
 
 func Neighbor(c Coord, side room.Side) Coord {
 	switch side {
@@ -51,5 +56,9 @@ func (b *Building) TryMove(side room.Side) bool {
 	}
 
 	b.Current = neighborCoord
+	if b.Visited == nil {
+		b.Visited = map[Coord]bool{}
+	}
+	b.Visited[neighborCoord] = true
 	return true
 }
