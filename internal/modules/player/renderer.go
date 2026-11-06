@@ -20,7 +20,7 @@ const (
 
 func (p *Player) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(p.Position.X*spriteSize), float64(p.Position.Y*spriteSize))
+	op.GeoM.Translate(p.Position.X, p.Position.Y)
 	screen.DrawImage(p.CurrentSprite, op)
 }
 
