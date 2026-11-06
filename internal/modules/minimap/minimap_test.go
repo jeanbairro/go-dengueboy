@@ -12,25 +12,25 @@ import (
 func TestLayoutCellsOnlyIncludesVisitedRooms(t *testing.T) {
 	b := &building.Building{
 		Rooms: map[building.Coord]*room.Room{
-			{0, 0}: {}, {1, 0}: {},
+			{X: 0, Y: 0}: {}, {X: 1, Y: 0}: {},
 		},
-		Current: building.Coord{0, 0},
-		Visited: map[building.Coord]bool{{0, 0}: true},
+		Current: building.Coord{X: 0, Y: 0},
+		Visited: map[building.Coord]bool{{X: 0, Y: 0}: true},
 	}
 
 	cells := minimap.LayoutCells(b)
 
 	require.Len(t, cells, 1)
-	require.Equal(t, building.Coord{0, 0}, cells[0].Coord)
+	require.Equal(t, building.Coord{X: 0, Y: 0}, cells[0].Coord)
 }
 
 func TestLayoutCellsFlagsExactlyTheCurrentRoom(t *testing.T) {
 	b := &building.Building{
 		Rooms: map[building.Coord]*room.Room{
-			{0, 0}: {}, {1, 0}: {},
+			{X: 0, Y: 0}: {}, {X: 1, Y: 0}: {},
 		},
-		Current: building.Coord{1, 0},
-		Visited: map[building.Coord]bool{{0, 0}: true, {1, 0}: true},
+		Current: building.Coord{X: 1, Y: 0},
+		Visited: map[building.Coord]bool{{X: 0, Y: 0}: true, {X: 1, Y: 0}: true},
 	}
 
 	cells := minimap.LayoutCells(b)
@@ -39,7 +39,7 @@ func TestLayoutCellsFlagsExactlyTheCurrentRoom(t *testing.T) {
 	for _, c := range cells {
 		if c.Current {
 			currentCount++
-			require.Equal(t, building.Coord{1, 0}, c.Coord)
+			require.Equal(t, building.Coord{X: 1, Y: 0}, c.Coord)
 		}
 	}
 	require.Equal(t, 1, currentCount)
@@ -48,12 +48,12 @@ func TestLayoutCellsFlagsExactlyTheCurrentRoom(t *testing.T) {
 func TestLayoutCellsPositionsRelativeToFullBoundingBox(t *testing.T) {
 	b := &building.Building{
 		Rooms: map[building.Coord]*room.Room{
-			{0, 0}: {}, {1, 0}: {}, {2, 0}: {},
+			{X: 0, Y: 0}: {}, {X: 1, Y: 0}: {}, {X: 2, Y: 0}: {},
 		},
-		Current: building.Coord{2, 0},
+		Current: building.Coord{X: 2, Y: 0},
 		// {1,0} exists in Rooms but is NOT visited — the bounding box
 		// must still account for it.
-		Visited: map[building.Coord]bool{{0, 0}: true, {2, 0}: true},
+		Visited: map[building.Coord]bool{{X: 0, Y: 0}: true, {X: 2, Y: 0}: true},
 	}
 
 	cells := minimap.LayoutCells(b)
@@ -64,17 +64,17 @@ func TestLayoutCellsPositionsRelativeToFullBoundingBox(t *testing.T) {
 		byCoord[c.Coord] = c
 	}
 
-	require.Equal(t, minimap.MarginX, byCoord[building.Coord{0, 0}].ScreenX)
-	require.Equal(t, minimap.MarginY, byCoord[building.Coord{0, 0}].ScreenY)
-	require.Equal(t, minimap.MarginX+2*(minimap.CellSize+minimap.CellGap), byCoord[building.Coord{2, 0}].ScreenX)
-	require.Equal(t, minimap.MarginY, byCoord[building.Coord{2, 0}].ScreenY)
+	require.Equal(t, minimap.MarginX, byCoord[building.Coord{X: 0, Y: 0}].ScreenX)
+	require.Equal(t, minimap.MarginY, byCoord[building.Coord{X: 0, Y: 0}].ScreenY)
+	require.Equal(t, minimap.MarginX+2*(minimap.CellSize+minimap.CellGap), byCoord[building.Coord{X: 2, Y: 0}].ScreenX)
+	require.Equal(t, minimap.MarginY, byCoord[building.Coord{X: 2, Y: 0}].ScreenY)
 }
 
 func TestLayoutCellsWithSingleRoomBuilding(t *testing.T) {
 	b := &building.Building{
-		Rooms:   map[building.Coord]*room.Room{{0, 0}: {}},
-		Current: building.Coord{0, 0},
-		Visited: map[building.Coord]bool{{0, 0}: true},
+		Rooms:   map[building.Coord]*room.Room{{X: 0, Y: 0}: {}},
+		Current: building.Coord{X: 0, Y: 0},
+		Visited: map[building.Coord]bool{{X: 0, Y: 0}: true},
 	}
 
 	cells := minimap.LayoutCells(b)

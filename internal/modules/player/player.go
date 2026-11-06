@@ -24,6 +24,8 @@ const (
 	speed            float64 = 2.56
 )
 
+const HitboxInset = 4
+
 var _ entity.Entity = (*Player)(nil)
 
 type (
@@ -79,9 +81,9 @@ func (p *Player) Move(movement geom.Position) {
 
 func toObject(position geom.Position) collision.Object {
 	return collision.Object{
-		Position: position,
-		Width:    float64(spriteSize),
-		Height:   float64(spriteSize),
+		Position: geom.Position{X: position.X + HitboxInset, Y: position.Y + HitboxInset},
+		Width:    float64(spriteSize) - 2*HitboxInset,
+		Height:   float64(spriteSize) - 2*HitboxInset,
 	}
 }
 

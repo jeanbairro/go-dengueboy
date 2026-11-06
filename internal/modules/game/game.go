@@ -86,8 +86,8 @@ func (g *Game) CheckRoomTransition() {
 
 func playerObject(position geom.Position) collision.Object {
 	return collision.Object{
-		Position: position,
-		Width:    maptile.ImageSize,
-		Height:   maptile.ImageSize,
+		Position: geom.Position{X: position.X + player.HitboxInset, Y: position.Y + player.HitboxInset},
+		Width:    float64(maptile.ImageSize) - 2*player.HitboxInset,
+		Height:   float64(maptile.ImageSize) - 2*player.HitboxInset,
 	}
 }
