@@ -1,6 +1,13 @@
 package minimap
 
-import "app/internal/modules/building"
+import (
+	"image/color"
+
+	"app/internal/modules/building"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
+)
 
 const (
 	CellSize = 10.0
@@ -41,4 +48,22 @@ func LayoutCells(b *building.Building) []Cell {
 		})
 	}
 	return cells
+}
+
+func Draw(screen *ebiten.Image, b *building.Building) {
+	for _, cell := range LayoutCells(b) {
+		clr := color.RGBA{150, 150, 150, 255}
+		if cell.Current {
+			clr = color.RGBA{255, 255, 255, 255}
+		}
+		vector.DrawFilledRect(
+			screen,
+			float32(cell.ScreenX),
+			float32(cell.ScreenY),
+			float32(CellSize),
+			float32(CellSize),
+			clr,
+			false,
+		)
+	}
 }

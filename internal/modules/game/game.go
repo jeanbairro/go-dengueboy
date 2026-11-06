@@ -6,6 +6,7 @@ import (
 	"app/internal/modules/entity"
 	"app/internal/modules/geom"
 	"app/internal/modules/maptile"
+	"app/internal/modules/minimap"
 	"app/internal/modules/player"
 	"app/internal/modules/room"
 
@@ -49,6 +50,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.Building.CurrentRoom().Map.Draw(screen)
 	g.Entities.Draw(screen)
+	minimap.Draw(screen, g.Building)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
